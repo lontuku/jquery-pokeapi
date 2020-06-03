@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Pokemon Api</title>
+</head>
+<body>
+    <h1>Pokemon Api</h1>
+    <ul id="list"></ul>
+    <button id="more" class="btn btn-success">Quiero ver mas pokemones!</button>
+
+    <script>
+        var next
+        function consult(url, successCallback){
+            $.ajax(url)
+            .done(successCallback)
+            .fail(function () {
+                console.log("mal")
+            })
+        }
+
+        function pokemonInit(response){
+            console.log(response)
+            next = response.next
+            console.log(next)
+            response.results.forEach(function (pokemon) {
+                console.log(pokemon.name)
+                var list = document.querySelector('#list')
+                var ele = document.createElement('li')
+                pokemonText = document.createTextNode(pokemon.name)
+                ele.appendChild(pokemonText)
+                list.appendChild(ele)
+                
+                card(pokemon.name, pokemon.url )
+            })
+        }
+
+        var button = document.querySelector('#more')
+        button.addEventListener('click', function(){
+            consult(next, pokemonInit)
+        })
+
+        function card(name, link){
+            var div1= document.createElement('div'),
+                div2= document.createElement('div'),
+                img = document.createElement('img'),
+                h5 = document.createElement('h5'),
+                p = document.createElement('p'),
+                button = document.createElement('button'),
+                b = document.querySelector('body')
+                
+     
+            div1.className = 'card'
+            div1.style.width = '18rem'
+            img.className = 'card-img-top'
+            div2.className = 'card-body'
+            h5.className = 'card-title'
+            p.className = 'card-text'
+            button.className = 'btn btn-primary'
+            button.appendChild(document.createTextNode('Go'))
+            p.appendChild(document.createTextNode('hola'))
+            h5.appendChild(document.createTextNode(name))
+
+            div2.appendChild(h5)
+            div2.appendChild(p)
+            div2.appendChild(button)
+            div1.appendChild(img)
+            div1.appendChild(div2)
+            b.appendChild(div1)
+
+            button.addEventListener('click', function () {
+                consult(link,pokemonData)
+            })
+    
+        }
+
+        function pokemonData(response){
+            console.log(response)
+            modal(response)
+        }
+
+        function consultType(response) {
+                console.log(response)
+        }
+
+        function modal(data){
+            var parapgraph = document.createElement('p'),
+                type = [],
+                abilities = [],
+                moves = [],
+                generations = []
+
+            data.types.forEach(elem => type.push(elem['type']['name']))
+            type = type.join(", ")
+            console.log(type)
+            data.abilities.forEach(elem => abilities.push((elem['ability']['name'])))
+            abilities = abilities.join(", ")
+            console.log(abilities)
+            // b = document.querySelector('body')
+            // b.appendChild(p)
+            moves = (data.moves.slice(0,5).map(x => x.move.name))
+            console.log(moves)
+            data.types.forEach(function(elem){
+                
+                consult(elem['type']['url'], consultType)
+            })
+                        
+        }
+
+       consult('https://pokeapi.co/api/v2/pokemon/', pokemonInit )
+       
+    </script>
+</body>
+</html>
+<!-- Nombre, 
+
+ generaciones (obtenidas a partir de la URL del tipo
+de pokémon), 
