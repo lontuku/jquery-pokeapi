@@ -4,16 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+    
     <title>Pokemon Api</title>
 </head>
-<body>
+<body style="margin-left: 10px;">
     <h1>Pokemon Api</h1>
     <ul id="list"></ul>
+    <main style="display: grid; grid-template-columns: 300px 300px 300px 300px; margin-right: auto;">
+    </main>
     <button id="more" class="btn btn-success">Quiero ver mas pokemones!</button>
-
+    
     <script>
         var next
         function consult(url, successCallback){
@@ -25,18 +33,18 @@
         }
 
         function pokemonInit(response){
-            console.log(response)
+            //console.log(response)
             next = response.next
-            console.log(next)
+            //console.log(next)
             response.results.forEach(function (pokemon) {
-                console.log(pokemon.name)
-                var list = document.querySelector('#list')
-                var ele = document.createElement('li')
-                pokemonText = document.createTextNode(pokemon.name)
-                ele.appendChild(pokemonText)
-                list.appendChild(ele)
+                //console.log(pokemon.name)
+                // var list = document.querySelector('#list')
+                // var ele = document.createElement('li')
+                // pokemonText = document.createTextNode(pokemon.name)
+                // ele.appendChild(pokemonText)
+                // list.appendChild(ele)
                 
-                card(pokemon.name, pokemon.url )
+                card(pokemon.name, pokemon.url)
             })
         }
 
@@ -52,64 +60,126 @@
                 h5 = document.createElement('h5'),
                 p = document.createElement('p'),
                 button = document.createElement('button'),
-                b = document.querySelector('body')
+                b = document.querySelector('body'),
+                main = document.querySelector('main')
                 
      
             div1.className = 'card'
             div1.style.width = '18rem'
+            div1.style.marginBottom = '10px'
             img.className = 'card-img-top'
             div2.className = 'card-body'
             h5.className = 'card-title'
             p.className = 'card-text'
-            button.className = 'btn btn-primary'
-            button.appendChild(document.createTextNode('Go'))
-            p.appendChild(document.createTextNode('hola'))
+            // button.className = 'btn btn-primary'
+            // button.id = 'modal'
+            // button.appendChild(document.createTextNode('¡Quiero saber mas!'))
+            p.appendChild(document.createTextNode(''))
             h5.appendChild(document.createTextNode(name))
 
-            div2.appendChild(h5)
-            div2.appendChild(p)
-            div2.appendChild(button)
-            div1.appendChild(img)
-            div1.appendChild(div2)
-            b.appendChild(div1)
+            consult(link, function(data){
+                img.src = data.sprites["front_default"]
+                img.className = "card-img-top"
+                img.style.width = "8rem"
+                img.style.marginLeft = "50px"
+                img.style.marginRight = "auto"
+                
+                string2 = `
+                 <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#${name}">
+                ¡Quiero saber mas!
+                    </button>
+                    `
+                div2.appendChild(h5)
+                div2.appendChild(img)
+                div2.appendChild(p)
+                //div2.appendChild(button)
+                $(div2).append(string2)
+                div1.appendChild(div2)
+                main.appendChild(div1)
 
-            button.addEventListener('click', function () {
-                consult(link,pokemonData)
+                var parapgraph = document.createElement('p'),
+                    type = [],
+                    abilities = [],
+                    moves = [],
+                    generations = []
+
+                data.types.forEach(elem => type.push(elem['type']['name']))
+                type = type.join(", ")
+                //console.log(type)
+                data.abilities.forEach(elem => abilities.push((elem['ability']['name'])))
+                abilities = abilities.join(", ")
+                //console.log(abilities)
+                // b = document.querySelector('body')
+                // b.appendChild(p)
+                moves = (data.moves.slice(0, 5).map(x => x.move.name))
+                //console.log(moves)
+                data.types.forEach(function (elem) {
+                    console.log(consult(elem['type']['url'], consultType))
+                })
+                    var titulo = "hola"
+                    var string =`
+                    <div class="modal fade" id="${name}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalCenterTitle">${name}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <b>Tipo</b>
+                                    <br>
+                                    ${type}
+                                    <br>
+                                    <br>
+                                    <b>Habilidades</b>
+                                    <br>
+                                     ${abilities}
+                                    <br>
+                                    <br>
+                                    <b>Movimientos</b>
+                                    <br>
+                                     ${moves}
+                                    <br>
+                                    <br>
+                                    <b>Generación</b>
+                                    <br>
+                                     ${generations}
+                                    <br>
+                                  
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `
+
+                $(div1).append(string); 
+               
             })
-    
+
+
+            // button.addEventListener('click', function () {
+            //     consult(link,pokemonData)
+            // })
         }
 
         function pokemonData(response){
-            console.log(response)
+            //console.log(response)
             modal(response)
         }
 
         function consultType(response) {
-                console.log(response)
+                //console.log(response)
         }
 
-        function modal(data){
-            var parapgraph = document.createElement('p'),
-                type = [],
-                abilities = [],
-                moves = [],
-                generations = []
 
-            data.types.forEach(elem => type.push(elem['type']['name']))
-            type = type.join(", ")
-            console.log(type)
-            data.abilities.forEach(elem => abilities.push((elem['ability']['name'])))
-            abilities = abilities.join(", ")
-            console.log(abilities)
-            // b = document.querySelector('body')
-            // b.appendChild(p)
-            moves = (data.moves.slice(0,5).map(x => x.move.name))
-            console.log(moves)
-            data.types.forEach(function(elem){
-                
-                consult(elem['type']['url'], consultType)
-            })
-                        
+        function modal(data){
+            
         }
 
        consult('https://pokeapi.co/api/v2/pokemon/', pokemonInit )
@@ -117,7 +187,4 @@
     </script>
 </body>
 </html>
-<!-- Nombre, 
 
- generaciones (obtenidas a partir de la URL del tipo
-de pokémon), 
